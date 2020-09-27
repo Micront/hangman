@@ -2,19 +2,31 @@ import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class Hangman {
-    private static final List<String> words = new ArrayList<String>();
-    private static final int maxMistake = 5;
-    private static final Scanner scanner = new Scanner(System.in);
-    private static final AtomicInteger countMistake = new AtomicInteger(0);
+    private final String word;
+    private final int maxMistake;
+    private final AtomicInteger countMistake;
+    private final Scanner scanner;
+
+    public Hangman(String word, int maxMistake, Scanner scanner) {
+        this.word = word;
+        this.maxMistake = maxMistake;
+        this.countMistake = new AtomicInteger(0);
+        this.scanner = scanner;
+    }
 
     public static void main(String[] args) {
-        fillDictionary();
-        char[] hiddenWord = guessWord();
+        List<String> dictionary = fillDictionary(new ArrayList<>());
+        Hangman hangman = new Hangman(chooseWord(dictionary), 5, new Scanner(System.in));
+        hangman.play();
+    }
+
+    public void play() {
+        char[] hiddenWord = word.toCharArray();
         char[] response = new char[hiddenWord.length];
         Arrays.fill(response, '*');
         while (true) {
             print("Guess a letter:");
-            char letter = readLetter();
+            char letter = readLetter(scanner);
             boolean hit = false;
             for (int i = 0; i < hiddenWord.length; i++) {
                 if (hiddenWord[i] == letter) {
@@ -38,22 +50,23 @@ public class Hangman {
         }
     }
 
-    private static void fillDictionary() {
-        words.add("hello");
-        words.add("human");
-        words.add("mother");
-        words.add("father");
+    private static ArrayList<String> fillDictionary(ArrayList<String> dictionary) {
+        dictionary.add("hello");
+        dictionary.add("human");
+        dictionary.add("mother");
+        dictionary.add("father");
+        return dictionary;
     }
 
-    private static char[] guessWord() {
-        return words.get(new Random().nextInt(words.size())).toCharArray();
+    private static String chooseWord(List<String> dictionary) {
+        return dictionary.get(new Random().nextInt(dictionary.size()));
     }
 
     private static void print(String s) {
         System.out.println(s);
     }
 
-    private static char readLetter() {
+    private static char readLetter(Scanner scanner) {
         return scanner.next().charAt(0);
     }
 }
